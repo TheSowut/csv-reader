@@ -1,7 +1,13 @@
 import { CsvRecord } from './types/CsvRecord';
 import * as fs from 'fs';
+import * as dotenv from 'dotenv';
 
 class CSVReader {
+
+    constructor() {
+        dotenv.config();
+        this.validateInputFile(process.env.INPUT_PATH!);
+    }
 
     public parseCsv = (content: string): CsvRecord => {
         const lines = content.split('\n');
@@ -25,7 +31,7 @@ class CSVReader {
         console.log(data);
     }
 
-    private exportToCsv = (data: CsvRecord, outputPath: string = '/home/pgavazov/Downloads/output.csv') => {
+    private exportToCsv = (data: CsvRecord, outputPath: string = process.env.OUTPUT_PATH!) => {
         const writeStream = fs.createWriteStream(outputPath, { flags: 'w' });
 
         for (let i = 0; i < data.length; i++) {
@@ -35,7 +41,13 @@ class CSVReader {
 
         writeStream.end();
     }
+
+    private validateInputFile(inputPath: string) {
+        if (!fs.existsSync(inputPath)) {
+            throw new Error(`Input File ${inputPath} does not exist.`);
+        }
+    }
 }
 
 const reader = new CSVReader();
-reader.readCsv('/home/pgavazov/Downloads/20231016082521.csv');
+reader.readCsv(process.env.INPUT_PATH!);
