@@ -11,13 +11,15 @@ class CSVReader {
 
     public parseCsv = (content: string): CsvRecord => {
         const lines = content.split('\n');
+        console.log(`${lines.length} lines of data loaded.\n`);
+
         const data = new Map();
 
         for (let i = 0; i < lines.length; i++) {
             const score = +lines[i].split(',')[1];
             if (!score) continue;
 
-            const scoreValue = data.get(score) ?? 1;
+            const scoreValue = data.get(score) ?? 0;
             data.set(score, scoreValue + 1);
         }
 
@@ -27,8 +29,8 @@ class CSVReader {
     public readCsv = (filePath: string) => {
         const content = fs.readFileSync(filePath, 'utf-8');
         const data = this.parseCsv(content);
-        this.exportToCsv(data);
         console.log(data);
+        this.exportToCsv(data);
     }
 
     private exportToCsv = (data: CsvRecord, outputPath: string = process.env.OUTPUT_PATH!) => {
@@ -40,6 +42,7 @@ class CSVReader {
         }
 
         writeStream.end();
+        console.log(`\nData successfully written to ${process.env.OUTPUT_PATH!}`);
     }
 
     private validateInputFile(inputPath: string) {
